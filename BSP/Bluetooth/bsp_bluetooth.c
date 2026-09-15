@@ -44,6 +44,8 @@ void UART5_Send_Char(char *s)
 		UART5_DataByte(*p);
 		p++;
 	}
+	/* Mirror protocol replies to the USB-UART tuning port. */
+	USART1_Send_Char(s);
 }
 
 //串口中断调用此文件  Serial port interrupt calls this file

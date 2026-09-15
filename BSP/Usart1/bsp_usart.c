@@ -47,10 +47,19 @@ int fputc(int ch, FILE *f)
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
+  if (huart->Instance == USART1)
+  {
+    /* USB-UART uses the same $...# protocol as the Bluetooth link. */
+    deal_bluetooth(RxTemp);
+    HAL_UART_Receive_IT(&huart1, &RxTemp, 1);
+  }
+}
 
-  UNUSED(huart);
-
-  HAL_UART_Receive_IT(&huart1, (uint8_t *)&RxTemp, 1);
-
-  HAL_UART_Transmit(&huart1, (uint8_t *)&RxTemp, 1, 0xFFFF);
+void USART1_Send_Char(char *s)
+{
+  while (*s != '\0')
+  {
+    while ((USART1->SR & USART_SR_TXE) == 0) {}
+    USART1->DR = (uint8_t)*s++;
+  }
 }

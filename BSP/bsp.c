@@ -15,4 +15,5 @@ void bsp_init(void)
     /* DMP initialization also configures the 200 Hz sensor interrupt. */
     DMP_Init();
     Battery_init();
+    HAL_UART_Receive_IT(&huart1, &RxTemp, 1);
 }

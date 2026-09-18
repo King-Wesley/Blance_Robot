@@ -13,7 +13,7 @@
   * the "License"; You may not use this file except in compliance with the
   * License. You may obtain a copy of the License at:
   *                        opensource.org/licenses/BSD-3-Clause
-  *
+  *8
   ******************************************************************************
   */
 /* USER CODE END Header */
@@ -105,6 +105,7 @@ int main(void)
   MX_TIM6_Init();
   MX_TIM8_Init();
   MX_USART1_UART_Init();
+  MX_USART2_UART_Init();
   MX_ADC1_Init();
 
   /* USER CODE BEGIN 2 */
@@ -114,6 +115,7 @@ int main(void)
   Car_Target_Velocity = 30;
   Car_Turn_Amplitude_speed = 36;
   bluetooth_init();
+  Glasses_Imu_Uart2_Start();
   TIM6_Init();
   MPU6050_EXTI_Init();
   /* Keep motors disabled until the start button is pressed. */

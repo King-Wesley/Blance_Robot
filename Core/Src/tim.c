@@ -30,6 +30,14 @@ TIM_HandleTypeDef htim4;
 TIM_HandleTypeDef htim6;
 TIM_HandleTypeDef htim8;
 
+/* TIM3 CH1/CH2 are the left wheel encoder and TIM2 is reserved for echo
+ * capture.  TIM5 is otherwise unused and provides the servo time base. */
+static TIM_HandleTypeDef htim5_servo;
+static volatile uint16_t pitch_pulse_us = 1500U;
+static volatile uint8_t pitch_sweep_enabled = 0U;
+static int16_t pitch_sweep_step_us = -10;
+static uint8_t pitch_sweep_wait_frames = 0U;
+
 /* TIM2 init function */
 
 /* TIM3 init function */
@@ -234,6 +242,109 @@ void MX_TIM8_Init(void)
   /* USER CODE END TIM8_Init 2 */
   HAL_TIM_MspPostInit(&htim8);
 
+}
+
+/* Generate a 50 Hz servo signal on PB1 (J6-L8) with TIM5 interrupts. */
+void Servo_Pitch_Init(void)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+  GPIO_InitStruct.Pin = GPIO_PIN_1;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_RESET);
+
+  __HAL_RCC_TIM5_CLK_ENABLE();
+  htim5_servo.Instance = TIM5;
+  htim5_servo.Init.Prescaler = 71;
+  htim5_servo.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim5_servo.Init.Period = 20000U - 1U;
+  htim5_servo.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim5_servo.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim5_servo) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  __HAL_TIM_SET_COMPARE(&htim5_servo, TIM_CHANNEL_1, pitch_pulse_us);
+  __HAL_TIM_CLEAR_FLAG(&htim5_servo, TIM_FLAG_UPDATE | TIM_FLAG_CC1);
+  __HAL_TIM_ENABLE_IT(&htim5_servo, TIM_IT_UPDATE | TIM_IT_CC1);
+  HAL_NVIC_SetPriority(TIM5_IRQn, 3, 1);
+  HAL_NVIC_EnableIRQ(TIM5_IRQn);
+  HAL_TIM_Base_Start(&htim5_servo);
+}
+
+void Servo_Pitch_SetPulseUs(uint16_t pulse_us)
+{
+  if (pulse_us < 500U)  pulse_us = 500U;
+  if (pulse_us > 2500U) pulse_us = 2500U;
+  pitch_pulse_us = pulse_us;
+  __HAL_TIM_SET_COMPARE(&htim5_servo, TIM_CHANNEL_1, pulse_us);
+}
+
+void Servo_Pitch_SetAngle(float angle_deg)
+{
+  if (angle_deg < 0.0f)   angle_deg = 0.0f;
+  if (angle_deg > 180.0f) angle_deg = 180.0f;
+  Servo_Pitch_SetPulseUs((uint16_t)(500.0f + angle_deg * (2000.0f / 180.0f)));
+}
+
+/* Move smoothly from 90 deg to 0 deg and back.  One frame changes 10 us,
+ * so a complete 90 -> 0 -> 90 sweep takes about four seconds. */
+void Servo_Pitch_StartSweep90To0(void)
+{
+  Servo_Pitch_SetAngle(90.0f);
+  pitch_sweep_step_us = -10;
+  pitch_sweep_wait_frames = 50U; /* hold 90 degrees for one second first */
+  pitch_sweep_enabled = 1U;
+}
+
+void Servo_Pitch_StopSweep(void)
+{
+  pitch_sweep_enabled = 0U;
+}
+
+/* Called from TIM5_IRQHandler. Keep this ISR short to limit PWM jitter. */
+void Servo_Pitch_TIM5_IRQHandler(void)
+{
+  uint32_t status = htim5_servo.Instance->SR;
+
+  if ((status & TIM_SR_UIF) != 0U)
+  {
+    __HAL_TIM_CLEAR_FLAG(&htim5_servo, TIM_FLAG_UPDATE);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_SET);
+
+    if (pitch_sweep_enabled)
+    {
+      if (pitch_sweep_wait_frames > 0U)
+      {
+        pitch_sweep_wait_frames--;
+      }
+      else
+      {
+        int32_t next_pulse = (int32_t)pitch_pulse_us + pitch_sweep_step_us;
+        if (next_pulse <= 500)
+        {
+          next_pulse = 500;
+          pitch_sweep_step_us = 10;
+        }
+        else if (next_pulse >= 1500)
+        {
+          next_pulse = 1500;
+          pitch_sweep_step_us = -10;
+        }
+        Servo_Pitch_SetPulseUs((uint16_t)next_pulse);
+      }
+    }
+  }
+  if ((status & TIM_SR_CC1IF) != 0U)
+  {
+    __HAL_TIM_CLEAR_FLAG(&htim5_servo, TIM_FLAG_CC1);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_RESET);
+  }
 }
 
 void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle)

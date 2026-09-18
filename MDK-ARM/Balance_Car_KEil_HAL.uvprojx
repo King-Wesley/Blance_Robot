@@ -10,7 +10,7 @@
       <TargetName>Balance_Car_KEil_HAL</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060960::V5.06 update 7 (build 960)::.\ARMCC</pCCUsed>
+      <pCCUsed>5060750::V5.06 update 6 (build 750)::ARMCC</pCCUsed>
       <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -592,13 +592,11 @@
               <FileType>1</FileType>
               <FilePath>..\BSP\Bluetooth\bsp_bluetooth.c</FilePath>
             </File>
-            
             <File>
               <FileName>delay.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\BSP\delay\delay.c</FilePath>
             </File>
-            
             <File>
               <FileName>encoder.c</FileName>
               <FileType>1</FileType>
@@ -614,8 +612,6 @@
               <FileType>1</FileType>
               <FilePath>..\BSP\INT_Sever\intsever.c</FilePath>
             </File>
-            
-            
             <File>
               <FileName>bsp_key.c</FileName>
               <FileType>1</FileType>
@@ -626,7 +622,6 @@
               <FileType>1</FileType>
               <FilePath>..\BSP\LED\bsp_LED.c</FilePath>
             </File>
-            
             <File>
               <FileName>motor.c</FileName>
               <FileType>1</FileType>
@@ -637,16 +632,11 @@
               <FileType>1</FileType>
               <FilePath>..\BSP\MPU6050\mpu6050.c</FilePath>
             </File>
-            
-            
-            
-            
             <File>
               <FileName>bsp_timer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\BSP\Timer\bsp_timer.c</FilePath>
             </File>
-            
             <File>
               <FileName>bsp_usart.c</FileName>
               <FileType>1</FileType>
@@ -662,27 +652,21 @@
               <FileType>1</FileType>
               <FilePath>..\BSP\Bluetooth\app_bluetooth.c</FilePath>
             </File>
-            
             <File>
               <FileName>app.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\APP\app.c</FilePath>
             </File>
-            
             <File>
               <FileName>app_control.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\APP\app_control.c</FilePath>
             </File>
-            
             <File>
               <FileName>app_motor.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\APP\app_motor.c</FilePath>
             </File>
-            
-            
-            
           </Files>
         </Group>
         <Group>
@@ -720,8 +704,6 @@
             </File>
           </Files>
         </Group>
-        
-        
         <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>

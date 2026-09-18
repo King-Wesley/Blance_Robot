@@ -3,6 +3,9 @@
 
 void bsp_init(void)
 {
+    /* Pitch servo on J6-L8 (PB1): start and hold its mechanical centre. */
+    Servo_Pitch_Init();
+    Servo_Pitch_StartSweep90To0();
     HAL_NVIC_DisableIRQ(EXTI15_10_IRQn);
     delay_init();
     init_led_gpio();

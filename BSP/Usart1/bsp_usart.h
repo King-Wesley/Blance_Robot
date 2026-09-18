@@ -6,7 +6,17 @@
 
 
 extern UART_HandleTypeDef huart1;
+extern UART_HandleTypeDef huart2;
 extern uint8_t RxTemp;
+
+extern volatile float Glasses_Pitch_Deg;
+extern volatile float Glasses_Yaw_Deg;
+extern volatile uint8_t Glasses_Imu_Valid;
+
+void Glasses_Imu_Uart2_Start(void);
+void Glasses_Imu_Process(void);
+void Uart1_Test_Process(void);
+void Uart2_Test_Process(void);
 
 void USART1_UART_Init(void);
 

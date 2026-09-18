@@ -47,6 +47,13 @@ void MX_TIM4_Init(void);
 void MX_TIM6_Init(void);
 void MX_TIM8_Init(void);
 
+/* Pitch servo: J6-L8 -> PB1. Typical command range is 500..2500 us. */
+void Servo_Pitch_Init(void);
+void Servo_Pitch_SetPulseUs(uint16_t pulse_us);
+void Servo_Pitch_SetAngle(float angle_deg);
+void Servo_Pitch_StartSweep90To0(void);
+void Servo_Pitch_StopSweep(void);
+
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
 /* USER CODE BEGIN Prototypes */

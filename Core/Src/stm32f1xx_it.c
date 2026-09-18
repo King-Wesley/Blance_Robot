@@ -60,6 +60,7 @@
 
 extern TIM_HandleTypeDef htim6;
 /* USER CODE BEGIN EV */
+extern void Servo_Pitch_TIM5_IRQHandler(void);
 
 /* USER CODE END EV */
 
@@ -202,13 +203,28 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
-  * @brief This function handles TIM2 global interrupt.
+  * @brief This function handles USART1 global interrupt.
   */
-
+void USART1_IRQHandler(void)
+{
+  HAL_UART_IRQHandler(&huart1);
+}
 
 /**
   * @brief This function handles USART2 global interrupt.
   */
+void USART2_IRQHandler(void)
+{
+  HAL_UART_IRQHandler(&huart2);
+}
+
+/**
+  * @brief This function handles TIM5 global interrupt.
+  */
+void TIM5_IRQHandler(void)
+{
+  Servo_Pitch_TIM5_IRQHandler();
+}
 
 
 /**
